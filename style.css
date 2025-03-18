@@ -10,7 +10,6 @@ body {
     margin: 0;
 }
 
-
 .container {
     background: #f79605;
     padding: 30px;
@@ -25,7 +24,6 @@ h1 {
     text-transform: uppercase;
     letter-spacing: 2px;
     color: #ff0000;
-    
 }
 
 #timer {
@@ -69,13 +67,16 @@ input {
     border: 2px solid #000000;
     color: #000000;
 }
+
 .keypad button:hover {
     background: black;
     border: 2px solid #00ff00;
     color: #00ff00;
 }
 
+
 /* Style de l'écran du coffre */
+
 .safe-code {
     font-size: 32px;
     text-align: center;
@@ -91,12 +92,16 @@ input {
     box-shadow: 0px 0px 15px #00ff00;
 }
 
+
 /* Effet de focus */
+
 .safe-code:focus {
     box-shadow: 0px 0px 20px #00ff00;
 }
 
+
 /* Style du message de validation */
+
 #safe-message {
     font-size: 18px;
     font-weight: bold;
@@ -105,7 +110,9 @@ input {
     text-shadow: 0 0 10px #ff0000;
 }
 
+
 /* Style du bouton */
+
 button {
     padding: 10px 20px;
     font-size: 18px;
@@ -140,7 +147,9 @@ input {
     color: #00ff00;
 }
 
+
 /* Style de l'écran du coffre */
+
 .safe-code {
     font-size: 32px;
     text-align: center;
@@ -156,12 +165,16 @@ input {
     box-shadow: 0px 0px 15px #00ff00;
 }
 
+
 /* Effet de focus */
+
 .safe-code:focus {
     box-shadow: 0px 0px 20px #00ff00;
 }
 
+
 /* Style du message de validation */
+
 #safe-message {
     font-size: 18px;
     font-weight: bold;
@@ -170,21 +183,44 @@ input {
     text-shadow: 0 0 10px #ff0000;
 }
 
-/* Style du bouton */
-button {
-    padding: 10px 20px;
-    font-size: 18px;
-    margin: 10px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    background: #ff0000;
+.alert-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: red;
     color: white;
-    text-transform: uppercase;
-    box-shadow: 0px 0px 10px #ff0000;
+    padding: 20px;
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    box-shadow: 0px 0px 15px red;
+    animation: flash-popup 0.3s infinite alternate;
+    z-index: 1000;
 }
 
-button:hover {
-    background: #990000;
-    box-shadow: 0px 0px 15px #ff0000;
+@keyframes flash-popup {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0.5;
+    }
+}
+
+.alert-effect #timer {
+    animation: flash-timer 0.3s infinite alternate;
+}
+
+@keyframes flash-timer {
+    0% {
+        color: #ff0000;
+        text-shadow: 0px 0px 5px #ff0000;
+        transform: scale(1);
+    }
+    100% {
+        color: #ffffff;
+        text-shadow: 0px 0px 15px #ffffff;
+        transform: scale(1.1);
+    }
 }
