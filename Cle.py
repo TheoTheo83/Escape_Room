@@ -9,7 +9,6 @@ class Cle:
     def __str__(self):
         return f"Clé avec détail: {self.detail}"
 
- Exemple d'utilisation
 try:
     cle1 = Cle(5)
     print(cle1)  # Affichera : Clé avec détail: 5

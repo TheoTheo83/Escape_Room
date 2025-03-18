@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escape Room - Vue Élève</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: url('background.jpg') no-repeat center center fixed;
+            background-size: cover;
+            text-align: center;
+            margin: 0;
+        }
+
+        .container {
+            background: #f79605;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 20px #fafafa;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #ff0000;
+        }
+
+        #timer {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #ff0000;
+            text-shadow: 0px 0px 5px #ff0000;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 18px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background: #ff0000;
+            color: white;
+            text-transform: uppercase;
+            box-shadow: 0px 0px 5px #ff0000;
+        }
+
+        button:hover {
+            background: #990000;
+            box-shadow: 0px 0px 15px #ff0000;
+        }
+
+        .safe-section {
+            margin-top: 30px;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .safe-code {
+            font-size: 32px;
+            text-align: center;
+            width: 60px;
+            padding: 10px;
+            margin: 0 5px;
+            background: black;
+            border: 3px solid #ffffff;
+            color: #ffffff;
+            font-family: 'Courier New', monospace;
+            text-shadow: 0 0 10px #ffffff;
+            outline: none;
+            border-radius: 5px;
+            box-shadow: 0px 0px 15px #ffffff;
+        }
+
+        .safe-code:focus {
+            box-shadow: 0px 0px 20px #ffffff;
+        }
+
+        #safe-message {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 10px;
+            color: #ff0000;
+            text-shadow: 0 0 10px #ff0000;
+        }
+
+        #errorMessage {
+            color: red;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .alert-effect #timer {
+            animation: flash-timer 0.3s infinite alternate;
+        }
+
+        @keyframes flash-timer {
+            0% {
+                color: #ff0000;
+                text-shadow: 0px 0px 5px #ff0000;
+                transform: scale(1);
+            }
+            100% {
+                color: #ffffff;
+                text-shadow: 0px 0px 15px #ffffff;
+                transform: scale(1.1);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Escape Room - Mission Secrète</h1>
+        <div id="timer">60:00</div>
+        
+        <div class="safe-section">
+            <h2>Coffre-Fort Secret</h2>
+            <p>Déchiffrez le code pour ouvrir le coffre et accéder aux indices cachés.</p>
+            
+            <div class="code-inputs">
+                <input type="number" class="safe-code" id="code1" value="0" min="0" max="9">
+                <input type="number" class="safe-code" id="code2" value="0" min="0" max="9">
+                <input type="number" class="safe-code" id="code3" value="0" min="0" max="9">
+                <input type="number" class="safe-code" id="code4" value="0" min="0" max="9">
+            </div>
+            
+            <button onclick="checkSafeCode()">Tentative d'ouverture</button>
+            
+            <p id="errorMessage" style="display: none;">Code incorrect, réessayez.</p>
+            <p id="safe-message"></p>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let countdown;
+        let timeLeft = 60 * 60; // 60 minutes par défaut
+        let savedCode = '1234'; // Le code sera mis à jour par le professeur via le système principal
+
+        // Initialisation
+        window.onload = function() {
+            updateTimerDisplay();
+            
+            // Vérification de l'état du timer via localStorage (si géré par le professeur)
+            if (localStorage.getItem('escapeRoomTimer')) {
+                timeLeft = parseInt(localStorage.getItem('escapeRoomTimer'));
+                updateTimerDisplay();
+            }
+            
+            // Vérification du code du coffre via localStorage (si géré par le professeur)
+            if (localStorage.getItem('escapeRoomSafeCode')) {
+                savedCode = localStorage.getItem('escapeRoomSafeCode');
+            }
+            
+            // Démarrage automatique du timer si déjà en cours
+            if (localStorage.getItem('timerRunning') === 'true') {
+                startTimer();
+            }
+        };
+
+        // Affichage du timer
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            document.getElementById("timer").innerText = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        // Le timer est contrôlé par le professeur, mais on inclut la fonction au cas où
+        function startTimer() {
+            if (countdown) return; // Évite les démarrages multiples
+            countdown = setInterval(() => {
+                if (timeLeft > 0) {
+                    timeLeft--;
+                    updateTimerDisplay();
+                    // Mise à jour du localStorage pour synchronisation
+                    localStorage.setItem('escapeRoomTimer', timeLeft);
+                } else {
+                    clearInterval(countdown);
+                    countdown = null;
+                    playAlarm();
+                    triggerVisualAlert();
+                    localStorage.setItem('timerRunning', 'false');
+                }
+            }, 1000);
+            localStorage.setItem('timerRunning', 'true');
+        }
+
+        // Vérification du code du coffre
+        function checkSafeCode() {
+            // Récupération des valeurs saisies
+            let code1 = document.getElementById('code1').value;
+            let code2 = document.getElementById('code2').value;
+            let code3 = document.getElementById('code3').value;
+            let code4 = document.getElementById('code4').value;
+
+            // Formation du code complet
+            let enteredCode = code1 + code2 + code3 + code4;
+
+            // Vérification
+            if (enteredCode === savedCode) {
+                document.getElementById('safe-message').innerText = 'Code correct, coffre ouvert !';
+                document.getElementById('errorMessage').style.display = 'none';
+                showSuccessAlert("Félicitations ! Vous avez trouvé la bonne combinaison !");
+            } else {
+                document.getElementById('errorMessage').style.display = 'block';
+                document.getElementById('safe-message').innerText = '';
+            }
+        }
+
+        // Alerte visuelle pour le succès
+        function showSuccessAlert(message) {
+            const alertBox = document.createElement("div");
+            alertBox.innerText = message;
+            alertBox.style.position = "fixed";
+            alertBox.style.top = "50%";
+            alertBox.style.left = "50%";
+            alertBox.style.transform = "translate(-50%, -50%)";
+            alertBox.style.background = "green";
+            alertBox.style.color = "white";
+            alertBox.style.padding = "20px";
+            alertBox.style.fontSize = "24px";
+            alertBox.style.fontWeight = "bold";
+            alertBox.style.boxShadow = "0px 0px 10px black";
+            alertBox.style.zIndex = "1000";
+            alertBox.style.borderRadius = "10px";
+            document.body.appendChild(alertBox);
+
+            setTimeout(() => {
+                alertBox.remove();
+            }, 5000);
+        }
+
+        // Alerte de fin de temps
+        function playAlarm() {
+            showSuccessAlert("⏰ TEMPS ÉCOULÉ !");
+        }
+
+        // Effet visuel pour l'alarme
+        function triggerVisualAlert() {
+            document.body.classList.add("alert-effect");
+        }
+
+        // Écoute des messages du système principal (pour communications depuis vue prof)
+        window.addEventListener('message', function(event) {
+            const data = event.data;
+            
+            // Mise à jour du timer
+            if (data.action === 'updateTimer') {
+                timeLeft = data.value;
+                updateTimerDisplay();
+            }
+            
+            // Démarrage du timer
+            if (data.action === 'startTimer') {
+                startTimer();
+            }
+            
+            // Mise à jour du code du coffre
+            if (data.action === 'updateSafeCode') {
+                savedCode = data.value;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escape Room - Login</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: url('background.jpg') no-repeat center center fixed;
+            background-size: cover;
+            text-align: center;
+            margin: 0;
+        }
+
+        .container {
+            background: #f79605;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 20px #fafafa;
+            max-width: 600px;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #ff0000;
+        }
+
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .login-form input {
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #000000;
+            border-radius: 5px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .user-type {
+            display: flex;
+            justify-content: center;
+            margin: 15px 0;
+        }
+
+        .user-type label {
+            margin: 0 15px;
+            cursor: pointer;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 18px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background: #ff0000;
+            color: white;
+            text-transform: uppercase;
+            box-shadow: 0px 0px 5px #ff0000;
+        }
+
+        button:hover {
+            background: #990000;
+            box-shadow: 0px 0px 15px #ff0000;
+        }
+
+        #login-message {
+            color: #ff0000;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="login-container">
+        <h1>Escape Room - Connexion</h1>
+        
+        <div class="user-type">
+            <label>
+                <input type="radio" name="userType" value="student" checked> Élève
+            </label>
+            <label>
+                <input type="radio" name="userType" value="teacher"> Professeur
+            </label>
+        </div>
+        
+        <div class="login-form">
+            <input type="text" id="username" placeholder="Nom d'utilisateur">
+            <input type="password" id="password" placeholder="Mot de passe">
+            <button onclick="login()">Connexion</button>
+        </div>
+        
+        <p id="login-message"></p>
+    </div>
+
+    <div class="container hidden" id="app-container">
+        <div id="teacher-controls" class="hidden">
+            <h1>Panneau de Contrôle Professeur</h1>
+            <button onclick="showStudentView()">Voir Vue Élève</button>
+            <button onclick="resetAllTimers()">Réinitialiser Tous les Chronomètres</button>
+            <button onclick="showSafeCode()">Afficher Code du Coffre</button>
+            <button onclick="changeSafeCode()">Changer Code du Coffre</button>
+            <div id="teacher-messages"></div>
+        </div>
+
+        <div id="student-view">
+            <h1>Escape Room - Compte à Rebours</h1>
+            <div id="timer">60:00</div>
+            
+            <div id="timer-controls" class="hidden">
+                <label for="minutes">Minutes :</label>
+                <input type="number" id="minutes" value="60" min="0" max="60">
+                <label for="seconds">Secondes :</label>
+                <input type="number" id="seconds" value="0" min="0" max="59">
+                <button onclick="setTimer(document.getElementById('minutes').value, document.getElementById('seconds').value)">Définir</button>
+            </div>
+            
+            <button onclick="startTimer()">Démarrer</button>
+            <button id="reset-button" onclick="resetTimer()">Réinitialiser</button>
+            
+            <div id="safe-container">
+                <h2>Entrez le code du coffre :</h2>
+                <div id="teacher-safe-controls" class="hidden">
+                    <input type="text" id="safe-code" maxlength="4" placeholder="0000">
+                    <button onclick="saveSafeCode()">Valider</button>
+                </div>
+                
+                <h2>Tentez d'ouvrir le coffre :</h2>
+                <input type="number" class="safe-code" id="code1" value="0" min="0" max="9">
+                <input type="number" class="safe-code" id="code2" value="0" min="0" max="9">
+                <input type="number" class="safe-code" id="code3" value="0" min="0" max="9">
+                <input type="number" class="safe-code" id="code4" value="0" min="0" max="9">
+                <button onclick="checkSafeCode()">Valider</button>
+                
+                <p id="errorMessage" style="color: red; display: none;">Code incorrect, réessayez.</p>
+                <p id="safe-message"></p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let countdown;
+        let timeLeft;
+        let currentUserType = '';
+        let savedCode = '1234'; // Code par défaut
+
+        // Définition des utilisateurs (normalement, cela serait stocké côté serveur)
+        const users = {
+            teachers: [
+                { username: 'prof', password: 'admin123' }
+            ],
+            students: [
+                { username: 'eleve', password: 'eleve123' }
+            ]
+        };
+
+        // Fonction de connexion
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const userType = document.querySelector('input[name="userType"]:checked').value;
+            
+            let authenticated = false;
+            
+            if (userType === 'teacher') {
+                authenticated = users.teachers.some(user => 
+                    user.username === username && user.password === password);
+                
+                if (authenticated) {
+                    currentUserType = 'teacher';
+                    document.getElementById('teacher-controls').classList.remove('hidden');
+                    document.getElementById('timer-controls').classList.remove('hidden');
+                    document.getElementById('teacher-safe-controls').classList.remove('hidden');
+                }
+            } else if (userType === 'student') {
+                authenticated = users.students.some(user => 
+                    user.username === username && user.password === password);
+                
+                if (authenticated) {
+                    currentUserType = 'student';
+                    document.getElementById('teacher-controls').classList.add('hidden');
+                    document.getElementById('timer-controls').classList.add('hidden');
+                    document.getElementById('teacher-safe-controls').classList.add('hidden');
+                }
+            }
+            
+            if (authenticated) {
+                document.getElementById('login-container').classList.add('hidden');
+                document.getElementById('app-container').classList.remove('hidden');
+                document.getElementById('login-message').textContent = '';
+            } else {
+                document.getElementById('login-message').textContent = 'Nom d\'utilisateur ou mot de passe incorrect.';
+            }
+        }
+
+        // Fonctions de minuterie
+        function setTimer(minutes, seconds) {
+            timeLeft = (parseInt(minutes) * 60) + parseInt(seconds);
+            updateTimerDisplay();
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            document.getElementById("timer").innerText = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function startTimer() {
+            if (countdown) return; // Empêche de relancer plusieurs fois
+            countdown = setInterval(() => {
+                if (timeLeft > 0) {
+                    timeLeft--;
+                    updateTimerDisplay();
+                } else {
+                    clearInterval(countdown);
+                    countdown = null;
+                    playAlarm(); // Joue une sonnerie à la fin
+                    triggerVisualAlert(); // Active l'effet visuel
+                }
+            }, 1000);
+        }
+
+        function resetTimer() {
+            
+            clearInterval(countdown);
+            countdown = null;
+            timeLeft = 60 * 60; // Réinitialise à 60 minutes par défaut
+            updateTimerDisplay();
+            removeVisualAlert(); // Désactive l'effet visuel lors de la réinitialisation
+        }
+
+        // Fonctions du coffre-fort
+        function saveSafeCode() {
+            savedCode = document.getElementById('safe-code').value;
+            document.getElementById('teacher-messages').innerHTML = 
+                `<p>Nouveau code du coffre: <strong>${savedCode}</strong></p>`;
+        }
+
+        function checkSafeCode() {
+            // Récupérer les valeurs des entrées du champ
+            let code1 = document.getElementById('code1').value;
+            let code2 = document.getElementById('code2').value;
+            let code3 = document.getElementById('code3').value;
+            let code4 = document.getElementById('code4').value;
+
+            // Créer une chaîne à partir des valeurs des entrées
+            let enteredCode = code1 + code2 + code3 + code4;
+
+            // Comparer les deux codes
+            if (enteredCode === savedCode) {
+                document.getElementById('safe-message').innerText = 'Code correct, coffre ouvert !';
+                document.getElementById('errorMessage').style.display = 'none'; // Cacher le message d'erreur
+                AlerteVisuel.afficherMessage("Félicitations ! Vous avez trouvé la bonne combinaison !");
+            } else {
+                document.getElementById('errorMessage').style.display = 'block'; // Afficher le message d'erreur
+                document.getElementById('safe-message').innerText = ''; // Réinitialiser le message de succès
+            }
+        }
+
+        // Fonctions spécifiques pour le professeur
+        function showStudentView() {
+            alert("Affichage de la vue élève");
+            window.location.href = "vueEleve.html";  // Redirection vers la page élève
+
+        }
+
+        function resetAllTimers() {
+            resetTimer();
+            alert("Tous les chronomètres ont été réinitialisés");
+        }
+
+        function showSafeCode() {
+            alert(`Le code actuel du coffre est: ${savedCode}`);
+        }
+
+        function changeSafeCode() {
+            const newCode = prompt("Entrez le nouveau code du coffre (4 chiffres):", "");
+            if (newCode && /^\d{4}$/.test(newCode)) {
+                savedCode = newCode;
+                document.getElementById('teacher-messages').innerHTML = 
+                    `<p>Nouveau code du coffre: <strong>${savedCode}</strong></p>`;
+            } else if (newCode) {
+                alert("Le code doit être composé de 4 chiffres uniquement.");
+            }
+        }
+
+        // Fonctions d'alerte
+        class AlerteVisuel {
+            static afficherMessage(message) {
+                const alertBox = document.createElement("div");
+                alertBox.innerText = message;
+                alertBox.style.position = "fixed";
+                alertBox.style.top = "50%";
+                alertBox.style.left = "50%";
+                alertBox.style.transform = "translate(-50%, -50%)";
+                alertBox.style.background = "green";
+                alertBox.style.color = "white";
+                alertBox.style.padding = "20px";
+                alertBox.style.fontSize = "24px";
+                alertBox.style.fontWeight = "bold";
+                alertBox.style.boxShadow = "0px 0px 10px black";
+                alertBox.style.zIndex = "1000"; // Assure qu'il apparaît au-dessus des autres éléments
+                document.body.appendChild(alertBox);
+
+                setTimeout(() => {
+                    alertBox.remove(); // Supprime l'alerte après 5 secondes
+                }, 5000);
+            }
+        }
+
+        function playAlarm() {
+            // Simulation d'une alarme sonore
+            AlerteVisuel.afficherMessage("⏰ TEMPS ÉCOULÉ !");
+        }
+
+        function triggerVisualAlert() {
+            document.body.classList.add("alert-effect");
+        }
+
+        function removeVisualAlert() {
+            document.body.classList.remove("alert-effect");
+        }
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            updateTimerDisplay();
+        });
+    </script>
+</body>
+</html>
