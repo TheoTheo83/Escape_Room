@@ -133,6 +133,21 @@
             border-radius: 10px;
             animation: fadeIn 0.5s;
         }
+        .error-alert {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgb(255, 1, 1);
+            color: white;
+            padding: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            box-shadow: 0px 0px 10px black;
+            z-index: 1000;
+            border-radius: 10px;
+            animation: fadeIn 0.5s;
+        }
         
         @keyframes fadeIn {
             from { opacity: 0; }
@@ -271,10 +286,11 @@
             if (enteredCode === savedCode) {
                 document.getElementById('safe-message').innerText = 'Code correct, coffre ouvert !';
                 document.getElementById('errorMessage').style.display = 'none';
-                showAlert("Félicitations ! Vous avez trouvé la bonne combinaison !");
+                showAlert("Félicitations ! Vous avez trouvé la bonne combinaison !", 'success-alert');
             } else {
                 document.getElementById('errorMessage').style.display = 'block';
                 document.getElementById('safe-message').innerText = '';
+                showAlert("Code incorrect ! Recommencez !", 'error-alert');
                 
                 // Effet de vibration sur les champs
                 const inputs = document.querySelectorAll('.safe-code');
@@ -288,10 +304,10 @@
         }
 
         // Alerte visuelle 
-        function showAlert(message) {
+        function showAlert(message, status) {
             const alertBox = document.createElement("div");
             alertBox.innerText = message;
-            alertBox.className = "success-alert";
+            alertBox.className = status;
             document.body.appendChild(alertBox);
 
             setTimeout(() => {
