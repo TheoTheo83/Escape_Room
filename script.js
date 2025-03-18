@@ -61,6 +61,7 @@ function checkSafeCode() {
     if (enteredCode === savedCode) {
         document.getElementById('safe-message').innerText = 'Code correct, coffre ouvert !';
         document.getElementById('errorMessage').style.display = 'none'; // Cacher le message d'erreur
+        AlerteVisuel.afficherMessage("Félicitations ! Vous avez trouver la bonne combinaison !")
     } else {
         document.getElementById('errorMessage').style.display = 'block'; // Afficher le message d'erreur
         document.getElementById('safe-message').innerText = ''; // Réinitialiser le message de succès
