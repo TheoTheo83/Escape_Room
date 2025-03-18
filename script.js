@@ -79,7 +79,7 @@ class AlerteVisuel {
         alertBox.style.top = "50%";
         alertBox.style.left = "50%";
         alertBox.style.transform = "translate(-50%, -50%)";
-        alertBox.style.background = "red";
+        alertBox.style.background = "green";
         alertBox.style.color = "white";
         alertBox.style.padding = "20px";
         alertBox.style.fontSize = "24px";
