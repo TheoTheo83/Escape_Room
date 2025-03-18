@@ -85,7 +85,7 @@ class AlerteVisuel {
         alertBox.style.background = "green";
         alertBox.style.color = "white";
         alertBox.style.padding = "20px";
-        alertBox.style.fontSize = "24px";
+        alertBox.style.fontSize = "50px";
         alertBox.style.fontWeight = "bold";
         alertBox.style.boxShadow = "0px 0px 10px black";
         alertBox.style.zIndex = "1000"; // Assure qu'il apparaît au-dessus des autres éléments
