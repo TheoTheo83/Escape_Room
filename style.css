@@ -65,12 +65,11 @@ input {
     padding: 5px;
     width: 50px;
     text-align: center;
-<<<<<<< Updated upstream
     background: rgb(255, 255, 255);
     border: 2px solid #000000;
     color: #000000;
 }
-=======
+.keypad button:hover {
     background: black;
     border: 2px solid #00ff00;
     color: #00ff00;
@@ -124,9 +123,6 @@ button:hover {
     background: #990000;
     box-shadow: 0px 0px 15px #ff0000;
 }
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
 
 label {
     font-size: 16px;
@@ -192,4 +188,3 @@ button:hover {
     background: #990000;
     box-shadow: 0px 0px 15px #ff0000;
 }
->>>>>>> Stashed changes
