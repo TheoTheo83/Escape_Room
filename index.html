@@ -11,7 +11,7 @@
 
 <body>
     <div class="container">
-        <h1>Escape Room - Compte à Rebours</h1>
+        <h1>Escape Box</h1>
         <div id="timer">05:00</div>
 
         <label for="minutes">Minutes :</label>
@@ -25,14 +25,14 @@
         <h2>Entrez le code du coffre :</h2>
         <input type="text" id="safe-code" maxlength="4" placeholder="0000">
         <button onclick="saveSafeCode()">Valider</button>
-        
+
         <h2>Entrez le code du coffre (valeurs individuelles) :</h2>
         <input type="number" class="safe-code" id="code1" value="0" min="0" max="9">
         <input type="number" class="safe-code" id="code2" value="0" min="0" max="9">
         <input type="number" class="safe-code" id="code3" value="0" min="0" max="9">
         <input type="number" class="safe-code" id="code4" value="0" min="0" max="9">
         <button onclick="checkSafeCode()">Valider</button>
-        
+
         <p id="errorMessage" style="color: red; display: none;">Code incorrect, réessayez.</p>
         <p id="safe-message"></p>
     </div>
