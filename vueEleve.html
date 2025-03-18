@@ -148,6 +148,7 @@
 </head>
 <body>
     <div class="container">
+        <button onclick=logout() href="login.html">Deconnexion</button>
         <h1>Escape Room - Mission Secrète</h1>
         <div id="timer">60:00</div>
         
@@ -313,6 +314,13 @@
             }
         `;
         document.head.appendChild(styleSheet);
+        function logout() {
+            if (confirm("Êtes-vous sûr de vouloir vous déconnecter ?")) {
+                localStorage.removeItem('escapeRoomUserType');
+                localStorage.removeItem('escapeRoomUsername');
+                window.location.href = 'login.html';
+            }
+        }
     </script>
 </body>
 </html>
