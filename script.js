@@ -23,6 +23,7 @@ function startTimer() {
             clearInterval(countdown);
             countdown = null;
             playAlarm(); // Joue une sonnerie à la fin
+            triggerVisualAlert(); // Active l'effet visuel
         }
     }, 1000);
 }
@@ -32,12 +33,14 @@ function resetTimer() {
     countdown = null;
     timeLeft = 60 * 60; // Réinitialise à 5 minutes par défaut
     updateTimerDisplay();
+    removeVisualAlert(); // Désactive l'effet visuel lors de la réinitialisation
 }
 
 function playAlarm() {
     const alarm = new Audio('alarm.mp3'); // Assurez-vous d'ajouter un fichier 'alarm.mp3' dans le même dossier
     alarm.play();
 }
+
 let savedCode = ''; // Variable pour sauvegarder le code
 
 // Fonction pour enregistrer le code entré dans le premier champ
@@ -68,9 +71,9 @@ function checkSafeCode() {
     }
 }
 
- 
 // Initialisation de l'affichage
 updateTimerDisplay();
+
 class AlerteVisuel {
     static afficherMessage(message) {
         const alertBox = document.createElement("div");
@@ -85,8 +88,9 @@ class AlerteVisuel {
         alertBox.style.fontSize = "24px";
         alertBox.style.fontWeight = "bold";
         alertBox.style.boxShadow = "0px 0px 10px black";
+        alertBox.style.zIndex = "1000"; // Assure qu'il apparaît au-dessus des autres éléments
         document.body.appendChild(alertBox);
-        
+
         setTimeout(() => {
             alertBox.remove(); // Supprime l'alerte après 5 secondes
         }, 5000);
@@ -96,7 +100,15 @@ class AlerteVisuel {
 function playAlarm() {
     const alarm = new Audio('alarm.mp3');
     alarm.play();
-    
+
     // Afficher l'alerte visuelle
     AlerteVisuel.afficherMessage("⏰ TEMPS ÉCOULÉ !");
+}
+
+function triggerVisualAlert() {
+    document.body.classList.add("alert-effect");
+}
+
+function removeVisualAlert() {
+    document.body.classList.remove("alert-effect");
 }
