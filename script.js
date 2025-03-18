@@ -38,17 +38,20 @@ function playAlarm() {
     const alarm = new Audio('alarm.mp3'); // Assurez-vous d'ajouter un fichier 'alarm.mp3' dans le même dossier
     alarm.play();
 }
-function checkUserCode() {
-    const userInput = document.getElementById("codeInput").value;
+const correctCode = "1234"; // Code secret
+
+function checkSafeCode() {
+    const userCode = document.getElementById("codeInput").value;
     const errorMessage = document.getElementById("errorMessage");
 
-    if (userInput === correctCode) {
-        alert("Code correct. Accès autorisé.");
-        errorMessage.style.display = "none"; // Cache le message d'erreur
+    if (userCode === correctCode) {
+        alert("✅ Code correct ! Le coffre est ouvert !");
+        errorMessage.style.display = "none";
     } else {
-        errorMessage.style.display = "block"; // Affiche le message d'erreur
+        errorMessage.style.display = "block";
     }
 }
+
  
 // Initialisation de l'affichage
 updateTimerDisplay();
