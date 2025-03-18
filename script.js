@@ -61,6 +61,7 @@ function checkSafeCode() {
     if (enteredCode === savedCode) {
         document.getElementById('safe-message').innerText = 'Code correct, coffre ouvert !';
         document.getElementById('errorMessage').style.display = 'none'; // Cacher le message d'erreur
+        AlerteVisuel.afficherMessage("Félicitations ! Vous avez trouver la bonne combinaison !")
     } else {
         document.getElementById('errorMessage').style.display = 'block'; // Afficher le message d'erreur
         document.getElementById('safe-message').innerText = ''; // Réinitialiser le message de succès
@@ -78,7 +79,7 @@ class AlerteVisuel {
         alertBox.style.top = "50%";
         alertBox.style.left = "50%";
         alertBox.style.transform = "translate(-50%, -50%)";
-        alertBox.style.background = "red";
+        alertBox.style.background = "green";
         alertBox.style.color = "white";
         alertBox.style.padding = "20px";
         alertBox.style.fontSize = "24px";
