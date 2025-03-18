@@ -38,6 +38,17 @@ function playAlarm() {
     const alarm = new Audio('alarm.mp3'); // Assurez-vous d'ajouter un fichier 'alarm.mp3' dans le même dossier
     alarm.play();
 }
+function checkUserCode() {
+    const userInput = document.getElementById("codeInput").value;
+    const errorMessage = document.getElementById("errorMessage");
 
+    if (userInput === correctCode) {
+        alert("Code correct. Accès autorisé.");
+        errorMessage.style.display = "none"; // Cache le message d'erreur
+    } else {
+        errorMessage.style.display = "block"; // Affiche le message d'erreur
+    }
+}
+ 
 // Initialisation de l'affichage
 updateTimerDisplay();
