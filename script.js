@@ -30,7 +30,7 @@ function startTimer() {
 function resetTimer() {
     clearInterval(countdown);
     countdown = null;
-    timeLeft = 5 * 60; // Réinitialise à 5 minutes par défaut
+    timeLeft = 60 * 60; // Réinitialise à 5 minutes par défaut
     updateTimerDisplay();
 }
 
