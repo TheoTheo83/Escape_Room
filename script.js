@@ -52,3 +52,32 @@ function checkUserCode() {
  
 // Initialisation de l'affichage
 updateTimerDisplay();
+class AlerteVisuel {
+    static afficherMessage(message) {
+        const alertBox = document.createElement("div");
+        alertBox.innerText = message;
+        alertBox.style.position = "fixed";
+        alertBox.style.top = "50%";
+        alertBox.style.left = "50%";
+        alertBox.style.transform = "translate(-50%, -50%)";
+        alertBox.style.background = "red";
+        alertBox.style.color = "white";
+        alertBox.style.padding = "20px";
+        alertBox.style.fontSize = "24px";
+        alertBox.style.fontWeight = "bold";
+        alertBox.style.boxShadow = "0px 0px 10px black";
+        document.body.appendChild(alertBox);
+        
+        setTimeout(() => {
+            alertBox.remove(); // Supprime l'alerte après 5 secondes
+        }, 5000);
+    }
+}
+
+function playAlarm() {
+    const alarm = new Audio('alarm.mp3');
+    alarm.play();
+    
+    // Afficher l'alerte visuelle
+    AlerteVisuel.afficherMessage("⏰ TEMPS ÉCOULÉ !");
+}

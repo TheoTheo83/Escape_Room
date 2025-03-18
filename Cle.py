@@ -9,11 +9,11 @@ class Cle:
     def __str__(self):
         return f"Clé avec détail: {self.detail}"
 
-# Exemple d'utilisation
-#try:
-   # cle1 = Cle(5)
-    #print(cle1)  # Affichera : Clé avec détail: 5
+ Exemple d'utilisation
+try:
+    cle1 = Cle(5)
+    print(cle1)  # Affichera : Clé avec détail: 5
     
-   # cle2 = Cle(10)  # Cela générera une exception
-#except ValueError as e:
-   # print(e)
+    cle2 = Cle(10)  # Cela générera une exception
+except ValueError as e:
+    print(e)
