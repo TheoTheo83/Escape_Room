@@ -26,6 +26,10 @@
         <input type="text" id="safe-code" maxlength="4" placeholder="0000">
         <h2>Entrez le code du coffre :</h2>
         <input type="text" id="codeInput" placeholder="Entrez le code">
+        <input type="number" class="safe-code" value="0" min="0" max="9">
+        <input type="number" class="safe-code" value="0" min="0" max="9">
+        <input type="number" class="safe-code" value="0" min="0" max="9">
+        <input type="number" class="safe-code" value="0" min="0" max="9">
         <button onclick="checkSafeCode()">Valider</button>
         <p id="errorMessage" style="color: red; display: none;">Code incorrect, réessayez.</p>
                 <p id="safe-message"></p>
