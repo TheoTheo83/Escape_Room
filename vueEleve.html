@@ -117,6 +117,33 @@
                 transform: scale(1.1);
             }
         }
+        
+        .success-alert {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: green;
+            color: white;
+            padding: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            box-shadow: 0px 0px 10px black;
+            z-index: 1000;
+            border-radius: 10px;
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .attempts-counter {
+            margin-top: 10px;
+            font-size: 16px;
+            color: #333;
+        }
     </style>
 </head>
 <body>
@@ -137,6 +164,10 @@
             
             <button onclick="checkSafeCode()">Tentative d'ouverture</button>
             
+            <div class="attempts-counter">
+                Tentatives: <span id="attempts">0</span>
+            </div>
+            
             <p id="errorMessage" style="display: none;">Code incorrect, réessayez.</p>
             <p id="safe-message"></p>
         </div>
@@ -145,29 +176,52 @@
     <script>
         // Variables globales
         let countdown;
-        let timeLeft = 60 * 60; // 60 minutes par défaut
-        let savedCode = '1234'; // Le code sera mis à jour par le professeur via le système principal
-
+        let timeLeft;
+        let attemptCount = 0;
+        
         // Initialisation
         window.onload = function() {
-            updateTimerDisplay();
-            
-            // Vérification de l'état du timer via localStorage (si géré par le professeur)
+            // Vérification du timer via localStorage
             if (localStorage.getItem('escapeRoomTimer')) {
                 timeLeft = parseInt(localStorage.getItem('escapeRoomTimer'));
-                updateTimerDisplay();
+            } else {
+                timeLeft = 60 * 60; // 60 minutes par défaut
             }
             
-            // Vérification du code du coffre via localStorage (si géré par le professeur)
-            if (localStorage.getItem('escapeRoomSafeCode')) {
-                savedCode = localStorage.getItem('escapeRoomSafeCode');
-            }
+            updateTimerDisplay();
             
-            // Démarrage automatique du timer si déjà en cours
+            // Vérification si le timer est déjà en cours
             if (localStorage.getItem('timerRunning') === 'true') {
                 startTimer();
             }
+            
+            // Mise en place des gestionnaires d'événements pour les champs de saisie
+            setupInputFields();
+            
+            // Mise à jour du compteur de tentatives
+            document.getElementById('attempts').innerText = attemptCount;
         };
+        
+        // Configuration des champs de saisie pour déplacer automatiquement le focus
+        function setupInputFields() {
+            const inputs = document.querySelectorAll('.safe-code');
+            
+            inputs.forEach((input, index) => {
+                // Passer au champ suivant après la saisie
+                input.addEventListener('input', function() {
+                    if (this.value.length === 1 && index < inputs.length - 1) {
+                        inputs[index + 1].focus();
+                    }
+                });
+                
+                // Gérer la touche de suppression pour revenir au champ précédent
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Backspace' && this.value.length === 0 && index > 0) {
+                        inputs[index - 1].focus();
+                    }
+                });
+            });
+        }
 
         // Affichage du timer
         function updateTimerDisplay() {
@@ -177,64 +231,66 @@
                 `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
         }
 
-        // Le timer est contrôlé par le professeur, mais on inclut la fonction au cas où
+        // Fonction de démarrage du timer
         function startTimer() {
             if (countdown) return; // Évite les démarrages multiples
+            
             countdown = setInterval(() => {
                 if (timeLeft > 0) {
                     timeLeft--;
                     updateTimerDisplay();
-                    // Mise à jour du localStorage pour synchronisation
-                    localStorage.setItem('escapeRoomTimer', timeLeft);
                 } else {
                     clearInterval(countdown);
                     countdown = null;
-                    playAlarm();
+                    showAlert("⏰ TEMPS ÉCOULÉ !");
                     triggerVisualAlert();
-                    localStorage.setItem('timerRunning', 'false');
                 }
             }, 1000);
-            localStorage.setItem('timerRunning', 'true');
         }
 
         // Vérification du code du coffre
         function checkSafeCode() {
             // Récupération des valeurs saisies
-            let code1 = document.getElementById('code1').value;
-            let code2 = document.getElementById('code2').value;
-            let code3 = document.getElementById('code3').value;
-            let code4 = document.getElementById('code4').value;
+            const code1 = document.getElementById('code1').value;
+            const code2 = document.getElementById('code2').value;
+            const code3 = document.getElementById('code3').value;
+            const code4 = document.getElementById('code4').value;
 
             // Formation du code complet
-            let enteredCode = code1 + code2 + code3 + code4;
+            const enteredCode = code1 + code2 + code3 + code4;
+            
+            // Augmentation du compteur de tentatives
+            attemptCount++;
+            document.getElementById('attempts').innerText = attemptCount;
+            
+            // Récupération du code enregistré
+            const savedCode = localStorage.getItem('escapeRoomSafeCode') || '1234'; // Code par défaut si non défini
 
             // Vérification
             if (enteredCode === savedCode) {
                 document.getElementById('safe-message').innerText = 'Code correct, coffre ouvert !';
                 document.getElementById('errorMessage').style.display = 'none';
-                showSuccessAlert("Félicitations ! Vous avez trouvé la bonne combinaison !");
+                showAlert("Félicitations ! Vous avez trouvé la bonne combinaison !");
             } else {
                 document.getElementById('errorMessage').style.display = 'block';
                 document.getElementById('safe-message').innerText = '';
+                
+                // Effet de vibration sur les champs
+                const inputs = document.querySelectorAll('.safe-code');
+                inputs.forEach(input => {
+                    input.style.animation = 'none';
+                    setTimeout(() => {
+                        input.style.animation = 'shake 0.5s';
+                    }, 10);
+                });
             }
         }
 
-        // Alerte visuelle pour le succès
-        function showSuccessAlert(message) {
+        // Alerte visuelle 
+        function showAlert(message) {
             const alertBox = document.createElement("div");
             alertBox.innerText = message;
-            alertBox.style.position = "fixed";
-            alertBox.style.top = "50%";
-            alertBox.style.left = "50%";
-            alertBox.style.transform = "translate(-50%, -50%)";
-            alertBox.style.background = "green";
-            alertBox.style.color = "white";
-            alertBox.style.padding = "20px";
-            alertBox.style.fontSize = "24px";
-            alertBox.style.fontWeight = "bold";
-            alertBox.style.boxShadow = "0px 0px 10px black";
-            alertBox.style.zIndex = "1000";
-            alertBox.style.borderRadius = "10px";
+            alertBox.className = "success-alert";
             document.body.appendChild(alertBox);
 
             setTimeout(() => {
@@ -242,36 +298,21 @@
             }, 5000);
         }
 
-        // Alerte de fin de temps
-        function playAlarm() {
-            showSuccessAlert("⏰ TEMPS ÉCOULÉ !");
-        }
-
         // Effet visuel pour l'alarme
         function triggerVisualAlert() {
             document.body.classList.add("alert-effect");
         }
-
-        // Écoute des messages du système principal (pour communications depuis vue prof)
-        window.addEventListener('message', function(event) {
-            const data = event.data;
-            
-            // Mise à jour du timer
-            if (data.action === 'updateTimer') {
-                timeLeft = data.value;
-                updateTimerDisplay();
+        
+        // Ajout d'une animation de secousse pour les erreurs
+        const styleSheet = document.createElement("style");
+        styleSheet.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+                20%, 40%, 60%, 80% { transform: translateX(5px); }
             }
-            
-            // Démarrage du timer
-            if (data.action === 'startTimer') {
-                startTimer();
-            }
-            
-            // Mise à jour du code du coffre
-            if (data.action === 'updateSafeCode') {
-                savedCode = data.value;
-            }
-        });
+        `;
+        document.head.appendChild(styleSheet);
     </script>
 </body>
 </html>

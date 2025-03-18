@@ -3,18 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Escape Room - Login</title>
+    <title>Escape Room - Vue Professeur</title>
     <style>
         body {
             font-family: 'Courier New', monospace;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             background: url('background.jpg') no-repeat center center fixed;
             background-size: cover;
             text-align: center;
             margin: 0;
+            padding: 20px;
+            background-color: #222;
         }
 
         .container {
@@ -22,7 +24,8 @@
             padding: 30px;
             border-radius: 10px;
             box-shadow: 0px 0px 20px #fafafa;
-            max-width: 600px;
+            max-width: 700px;
+            width: 100%;
         }
 
         h1 {
@@ -31,38 +34,20 @@
             text-transform: uppercase;
             letter-spacing: 2px;
             color: #ff0000;
+            text-shadow: 0px 0px 5px rgba(255, 0, 0, 0.5);
         }
 
-        .login-form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
+        #timer {
+            font-size: 48px;
+            font-weight: bold;
             margin-bottom: 20px;
-        }
-
-        .login-form input {
-            padding: 10px;
-            font-size: 16px;
-            border: 2px solid #000000;
-            border-radius: 5px;
-            width: 100%;
-            box-sizing: border-box;
-        }
-
-        .user-type {
-            display: flex;
-            justify-content: center;
-            margin: 15px 0;
-        }
-
-        .user-type label {
-            margin: 0 15px;
-            cursor: pointer;
+            color: #ff0000;
+            text-shadow: 0px 0px 5px #ff0000;
         }
 
         button {
             padding: 10px 20px;
-            font-size: 18px;
+            font-size: 16px;
             margin: 5px;
             border: none;
             border-radius: 5px;
@@ -71,152 +56,300 @@
             color: white;
             text-transform: uppercase;
             box-shadow: 0px 0px 5px #ff0000;
+            transition: all 0.3s;
         }
 
         button:hover {
             background: #990000;
             box-shadow: 0px 0px 15px #ff0000;
+            transform: translateY(-2px);
         }
 
-        #login-message {
-            color: #ff0000;
+        label {
+            font-size: 16px;
+            margin-right: 5px;
+            color: #000000;
+            font-weight: bold;
+        }
+
+        input {
+            font-size: 16px;
+            padding: 5px;
+            width: 50px;
+            text-align: center;
+            background: rgb(255, 255, 255);
+            border: 2px solid #000000;
+            color: #000000;
+        }
+
+        .safe-code {
+            font-size: 32px;
+            text-align: center;
+            width: 60px;
+            padding: 10px;
+            background: black;
+            border: 3px solid #ffffff;
+            color: #ffffff;
+            font-family: 'Courier New', monospace;
+            text-shadow: 0 0 10px #ffffff;
+            outline: none;
+            border-radius: 5px;
+            box-shadow: 0px 0px 15px #ffffff;
+        }
+
+        #safe-code {
+            width: 120px;
+        }
+
+        .safe-code:focus {
+            box-shadow: 0px 0px 20px #ffffff;
+        }
+
+        #safe-message {
+            font-size: 18px;
             font-weight: bold;
             margin-top: 10px;
+            color: #ff0000;
+            text-shadow: 0 0 10px #ff0000;
         }
 
-        .hidden {
+        .alert-effect #timer {
+            animation: flash-timer 0.3s infinite alternate;
+        }
+
+        @keyframes flash-timer {
+            0% {
+                color: #ff0000;
+                text-shadow: 0px 0px 5px #ff0000;
+                transform: scale(1);
+            }
+            100% {
+                color: #ffffff;
+                text-shadow: 0px 0px 15px #ffffff;
+                transform: scale(1.1);
+            }
+        }
+        
+        .message-box {
+            background-color: #000;
+            color: #0f0;
+            padding: 10px;
+            margin-top: 20px;
+            border-radius: 5px;
+            text-align: left;
+            font-family: monospace;
+            height: 150px;
+            overflow-y: auto;
+        }
+
+        .admin-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+
+        .admin-section h2 {
+            color: #ff0000;
+            text-transform: uppercase;
+            font-size: 20px;
+            margin-top: 0;
+        }
+
+        .admin-controls {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .admin-controls button {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .user-info {
+            background-color: #000;
+            color: #ff0000;
+            padding: 8px 15px;
+            border-radius: 20px;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-info .icon {
+            font-size: 24px;
+        }
+        
+        .modal {
             display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            max-width: 800px;
+            height: 80%;
+            border: 5px solid #ff0000;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .modal-content iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            color: #ff0000;
+            font-size: 30px;
+            cursor: pointer;
+            z-index: 1001;
+        }
+        
+        .close-modal:hover {
+            color: #fff;
+            text-shadow: 0 0 10px #ff0000;
         }
     </style>
 </head>
 <body>
-    <div class="container" id="login-container">
-        <h1>Escape Room - Connexion</h1>
-        
-        <div class="user-type">
-            <label>
-                <input type="radio" name="userType" value="student" checked> Élève
-            </label>
-            <label>
-                <input type="radio" name="userType" value="teacher"> Professeur
-            </label>
-        </div>
-        
-        <div class="login-form">
-            <input type="text" id="username" placeholder="Nom d'utilisateur">
-            <input type="password" id="password" placeholder="Mot de passe">
-            <button onclick="login()">Connexion</button>
-        </div>
-        
-        <p id="login-message"></p>
+    <div class="user-info">
+        <span class="icon">👨‍🏫</span>
+        <span id="username-display">Professeur</span>
+        <button onclick="logout()" style="padding: 5px 10px; font-size: 12px; margin: 0;">Déconnexion</button>
     </div>
 
-    <div class="container hidden" id="app-container">
-        <div id="teacher-controls" class="hidden">
-            <h1>Panneau de Contrôle Professeur</h1>
-            <button onclick="showStudentView()">Voir Vue Élève</button>
-            <button onclick="resetAllTimers()">Réinitialiser Tous les Chronomètres</button>
-            <button onclick="showSafeCode()">Afficher Code du Coffre</button>
-            <button onclick="changeSafeCode()">Changer Code du Coffre</button>
-            <div id="teacher-messages"></div>
+    <div class="container">
+        <h1>Escape Room - Panneau du Professeur</h1>
+        <div id="timer">60:00</div>
+        
+        <div>
+            <label for="minutes">Minutes :</label>
+            <input type="number" id="minutes" value="60" min="0" max="60">
+            <label for="seconds">Secondes :</label>
+            <input type="number" id="seconds" value="0" min="0" max="59">
+            <button onclick="setTimer(document.getElementById('minutes').value, document.getElementById('seconds').value)">Définir</button>
         </div>
-
-        <div id="student-view">
-            <h1>Escape Room - Compte à Rebours</h1>
-            <div id="timer">60:00</div>
-            
-            <div id="timer-controls" class="hidden">
-                <label for="minutes">Minutes :</label>
-                <input type="number" id="minutes" value="60" min="0" max="60">
-                <label for="seconds">Secondes :</label>
-                <input type="number" id="seconds" value="0" min="0" max="59">
-                <button onclick="setTimer(document.getElementById('minutes').value, document.getElementById('seconds').value)">Définir</button>
+        
+        <button onclick="startTimer()">Démarrer</button>
+        <button onclick="resetTimer()">Réinitialiser</button>
+        
+        <h2>Définition du code du coffre :</h2>
+        <input type="text" id="safe-code" maxlength="4" placeholder="0000">
+        <button onclick="saveSafeCode()">Valider</button>
+        
+        <div class="admin-section">
+            <h2>Fonctions Administrateur</h2>
+            <div class="admin-controls">
+                <button onclick="showStudentView()">
+                    <span class="icon">👁️</span> Prévisualiser Vue Élève
+                </button>
+                <button onclick="openStudentViewInNewTab()">
+                    <span class="icon">📱</span> Ouvrir Vue Élève (Nouvel Onglet)
+                </button>
+                <button onclick="resetAllProgress()">
+                    <span class="icon">🔄</span> Réinitialiser Progression
+                </button>
+                <button onclick="exportSessionData()">
+                    <span class="icon">💾</span> Exporter les Données
+                </button>
             </div>
-            
-            <button onclick="startTimer()">Démarrer</button>
-            <button id="reset-button" onclick="resetTimer()">Réinitialiser</button>
-            
-            <div id="safe-container">
-                <h2>Entrez le code du coffre :</h2>
-                <div id="teacher-safe-controls" class="hidden">
-                    <input type="text" id="safe-code" maxlength="4" placeholder="0000">
-                    <button onclick="saveSafeCode()">Valider</button>
-                </div>
-                
-                <h2>Tentez d'ouvrir le coffre :</h2>
-                <input type="number" class="safe-code" id="code1" value="0" min="0" max="9">
-                <input type="number" class="safe-code" id="code2" value="0" min="0" max="9">
-                <input type="number" class="safe-code" id="code3" value="0" min="0" max="9">
-                <input type="number" class="safe-code" id="code4" value="0" min="0" max="9">
-                <button onclick="checkSafeCode()">Valider</button>
-                
-                <p id="errorMessage" style="color: red; display: none;">Code incorrect, réessayez.</p>
-                <p id="safe-message"></p>
-            </div>
+        </div>
+        
+        <div class="message-box" id="status-box">
+            <p>Système initialisé. En attente de configuration...</p>
         </div>
     </div>
     
+    <!-- Modal pour la prévisualisation -->
+    <div id="preview-modal" class="modal">
+        <span class="close-modal" onclick="closeStudentView()">&times;</span>
+        <div class="modal-content">
+            <iframe id="student-iframe" src="vueEleve.html"></iframe>
+        </div>
+    </div>
+
     <script>
         let countdown;
-        let timeLeft;
-        let currentUserType = '';
+        let timeLeft = 60 * 60; // 60 minutes par défaut
         let savedCode = '1234'; // Code par défaut
-
-        // Définition des utilisateurs (normalement, cela serait stocké côté serveur)
-        const users = {
-            teachers: [
-                { username: 'prof', password: 'admin123' }
-            ],
-            students: [
-                { username: 'eleve', password: 'eleve123' }
-            ]
+        
+        // Initialisation
+        window.onload = function() {
+            // Vérification de l'authentification
+            const userType = localStorage.getItem('escapeRoomUserType');
+            const username = localStorage.getItem('escapeRoomUsername');
+            
+            if (userType !== 'teacher') {
+                // Redirection vers la page de login si non connecté en tant que professeur
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // Affichage du nom d'utilisateur
+            if (username) {
+                document.getElementById('username-display').textContent = username;
+            }
+            
+            updateTimerDisplay();
+            
+            // Vérifier si un code est déjà enregistré
+            if (localStorage.getItem('escapeRoomSafeCode')) {
+                savedCode = localStorage.getItem('escapeRoomSafeCode');
+                document.getElementById('safe-code').value = savedCode;
+                logStatus(`Code du coffre chargé: ${savedCode}`);
+            }
+            
+            // Vérifier si un temps est déjà enregistré
+            if (localStorage.getItem('escapeRoomTimer')) {
+                timeLeft = parseInt(localStorage.getItem('escapeRoomTimer'));
+                updateTimerDisplay();
+                
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                document.getElementById('minutes').value = minutes;
+                document.getElementById('seconds').value = seconds;
+                
+                logStatus(`Timer chargé: ${minutes}:${seconds.toString().padStart(2, '0')}`);
+            }
+            
+            // Vérifier si le timer est en cours
+            if (localStorage.getItem('timerRunning') === 'true') {
+                startTimer();
+                logStatus("Timer en cours - reprise automatique");
+            }
         };
-
-        // Fonction de connexion
-        function login() {
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            const userType = document.querySelector('input[name="userType"]:checked').value;
-            
-            let authenticated = false;
-            
-            if (userType === 'teacher') {
-                authenticated = users.teachers.some(user => 
-                    user.username === username && user.password === password);
-                
-                if (authenticated) {
-                    currentUserType = 'teacher';
-                    document.getElementById('teacher-controls').classList.remove('hidden');
-                    document.getElementById('timer-controls').classList.remove('hidden');
-                    document.getElementById('teacher-safe-controls').classList.remove('hidden');
-                }
-            } else if (userType === 'student') {
-                authenticated = users.students.some(user => 
-                    user.username === username && user.password === password);
-                
-                if (authenticated) {
-                    currentUserType = 'student';
-                    document.getElementById('teacher-controls').classList.add('hidden');
-                    document.getElementById('timer-controls').classList.add('hidden');
-                    document.getElementById('teacher-safe-controls').classList.add('hidden');
-                }
-            }
-            
-            if (authenticated) {
-                document.getElementById('login-container').classList.add('hidden');
-                document.getElementById('app-container').classList.remove('hidden');
-                document.getElementById('login-message').textContent = '';
-            } else {
-                document.getElementById('login-message').textContent = 'Nom d\'utilisateur ou mot de passe incorrect.';
-            }
-        }
-
-        // Fonctions de minuterie
+        
+        // Fonction pour définir le timer
         function setTimer(minutes, seconds) {
             timeLeft = (parseInt(minutes) * 60) + parseInt(seconds);
             updateTimerDisplay();
+            localStorage.setItem('escapeRoomTimer', timeLeft);
+            logStatus(`Timer défini à ${minutes}:${seconds.toString().padStart(2, '0')}`);
         }
 
+        // Mise à jour de l'affichage du timer
         function updateTimerDisplay() {
             const minutes = Math.floor(timeLeft / 60);
             const seconds = timeLeft % 60;
@@ -224,126 +357,127 @@
                 `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
         }
 
+        // Démarrer le timer
         function startTimer() {
             if (countdown) return; // Empêche de relancer plusieurs fois
             countdown = setInterval(() => {
                 if (timeLeft > 0) {
                     timeLeft--;
                     updateTimerDisplay();
+                    localStorage.setItem('escapeRoomTimer', timeLeft);
                 } else {
                     clearInterval(countdown);
                     countdown = null;
-                    playAlarm(); // Joue une sonnerie à la fin
-                    triggerVisualAlert(); // Active l'effet visuel
+                    triggerVisualAlert();
+                    logStatus("TEMPS ÉCOULÉ!");
+                    localStorage.setItem('timerRunning', 'false');
                 }
             }, 1000);
+            localStorage.setItem('timerRunning', 'true');
+            logStatus("Timer démarré");
         }
 
+        // Réinitialiser le timer
         function resetTimer() {
-            
             clearInterval(countdown);
             countdown = null;
             timeLeft = 60 * 60; // Réinitialise à 60 minutes par défaut
             updateTimerDisplay();
-            removeVisualAlert(); // Désactive l'effet visuel lors de la réinitialisation
+            removeVisualAlert();
+            localStorage.setItem('escapeRoomTimer', timeLeft);
+            localStorage.setItem('timerRunning', 'false');
+            logStatus("Timer réinitialisé");
         }
 
-        // Fonctions du coffre-fort
+        // Sauvegarder le code du coffre
         function saveSafeCode() {
-            savedCode = document.getElementById('safe-code').value;
-            document.getElementById('teacher-messages').innerHTML = 
-                `<p>Nouveau code du coffre: <strong>${savedCode}</strong></p>`;
-        }
-
-        function checkSafeCode() {
-            // Récupérer les valeurs des entrées du champ
-            let code1 = document.getElementById('code1').value;
-            let code2 = document.getElementById('code2').value;
-            let code3 = document.getElementById('code3').value;
-            let code4 = document.getElementById('code4').value;
-
-            // Créer une chaîne à partir des valeurs des entrées
-            let enteredCode = code1 + code2 + code3 + code4;
-
-            // Comparer les deux codes
-            if (enteredCode === savedCode) {
-                document.getElementById('safe-message').innerText = 'Code correct, coffre ouvert !';
-                document.getElementById('errorMessage').style.display = 'none'; // Cacher le message d'erreur
-                AlerteVisuel.afficherMessage("Félicitations ! Vous avez trouvé la bonne combinaison !");
+            const codeInput = document.getElementById('safe-code').value;
+            
+            // Validation du code (uniquement des chiffres et exactement 4 caractères)
+            if (/^\d{4}$/.test(codeInput)) {
+                savedCode = codeInput;
+                localStorage.setItem('escapeRoomSafeCode', savedCode);
+                logStatus(`Nouveau code du coffre enregistré: ${savedCode}`);
             } else {
-                document.getElementById('errorMessage').style.display = 'block'; // Afficher le message d'erreur
-                document.getElementById('safe-message').innerText = ''; // Réinitialiser le message de succès
+                logStatus("ERREUR: Le code doit contenir exactement 4 chiffres");
             }
         }
 
-        // Fonctions spécifiques pour le professeur
-        function showStudentView() {
-            alert("Affichage de la vue élève");
-            window.location.href = "vueEleve.html";  // Redirection vers la page élève
-
+        // Journal d'activité
+        function logStatus(message) {
+            const statusBox = document.getElementById('status-box');
+            const timestamp = new Date().toLocaleTimeString();
+            statusBox.innerHTML += `<p>[${timestamp}] ${message}</p>`;
+            statusBox.scrollTop = statusBox.scrollHeight;
         }
 
-        function resetAllTimers() {
-            resetTimer();
-            alert("Tous les chronomètres ont été réinitialisés");
-        }
-
-        function showSafeCode() {
-            alert(`Le code actuel du coffre est: ${savedCode}`);
-        }
-
-        function changeSafeCode() {
-            const newCode = prompt("Entrez le nouveau code du coffre (4 chiffres):", "");
-            if (newCode && /^\d{4}$/.test(newCode)) {
-                savedCode = newCode;
-                document.getElementById('teacher-messages').innerHTML = 
-                    `<p>Nouveau code du coffre: <strong>${savedCode}</strong></p>`;
-            } else if (newCode) {
-                alert("Le code doit être composé de 4 chiffres uniquement.");
-            }
-        }
-
-        // Fonctions d'alerte
-        class AlerteVisuel {
-            static afficherMessage(message) {
-                const alertBox = document.createElement("div");
-                alertBox.innerText = message;
-                alertBox.style.position = "fixed";
-                alertBox.style.top = "50%";
-                alertBox.style.left = "50%";
-                alertBox.style.transform = "translate(-50%, -50%)";
-                alertBox.style.background = "green";
-                alertBox.style.color = "white";
-                alertBox.style.padding = "20px";
-                alertBox.style.fontSize = "24px";
-                alertBox.style.fontWeight = "bold";
-                alertBox.style.boxShadow = "0px 0px 10px black";
-                alertBox.style.zIndex = "1000"; // Assure qu'il apparaît au-dessus des autres éléments
-                document.body.appendChild(alertBox);
-
-                setTimeout(() => {
-                    alertBox.remove(); // Supprime l'alerte après 5 secondes
-                }, 5000);
-            }
-        }
-
-        function playAlarm() {
-            // Simulation d'une alarme sonore
-            AlerteVisuel.afficherMessage("⏰ TEMPS ÉCOULÉ !");
-        }
-
+        // Effet visuel pour l'alarme
         function triggerVisualAlert() {
             document.body.classList.add("alert-effect");
         }
 
+        // Désactiver l'effet visuel
         function removeVisualAlert() {
             document.body.classList.remove("alert-effect");
         }
-
-        // Initialisation
-        document.addEventListener('DOMContentLoaded', function() {
-            updateTimerDisplay();
-        });
+        
+        // Fonctions d'administration
+        
+        // Afficher la vue élève dans une modal
+        function showStudentView() {
+            document.getElementById('preview-modal').style.display = 'block';
+            logStatus("Prévisualisation de la vue élève ouverte");
+        }
+        
+        // Fermer la modal de prévisualisation
+        function closeStudentView() {
+            document.getElementById('preview-modal').style.display = 'none';
+        }
+        
+        // Ouvrir la vue élève dans un nouvel onglet
+        function openStudentViewInNewTab() {
+            window.open('vueEleve.html', '_blank');
+            logStatus("Vue élève ouverte dans un nouvel onglet");
+        }
+        
+        // Réinitialiser toute la progression
+        function resetAllProgress() {
+            if (confirm("Êtes-vous sûr de vouloir réinitialiser toute la progression ? Cette action est irréversible.")) {
+                resetTimer();
+                localStorage.removeItem('attemptCount');
+                logStatus("Toute la progression a été réinitialisée");
+            }
+        }
+        
+        // Exporter les données de la session
+        function exportSessionData() {
+            const sessionData = {
+                safeCode: savedCode,
+                timer: timeLeft,
+                timerRunning: localStorage.getItem('timerRunning') === 'true',
+                attemptCount: localStorage.getItem('attemptCount') || '0',
+                timestamp: new Date().toISOString()
+            };
+            
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(sessionData, null, 2));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", "escape_room_session.json");
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+            
+            logStatus("Données de session exportées");
+        }
+        
+        // Déconnexion
+        function logout() {
+            if (confirm("Êtes-vous sûr de vouloir vous déconnecter ?")) {
+                localStorage.removeItem('escapeRoomUserType');
+                localStorage.removeItem('escapeRoomUsername');
+                window.location.href = 'login.html';
+            }
+        }
     </script>
 </body>
 </html>

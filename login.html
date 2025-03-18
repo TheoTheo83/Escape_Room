@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escape Room - Login</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: url('background.jpg') no-repeat center center fixed;
+            background-size: cover;
+            margin: 0;
+            background-color: #222;
+        }
+
+        .login-container {
+            background: #f79605;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 20px rgba(255, 255, 255, 0.3);
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 30px;
+            font-size: 28px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #ff0000;
+            text-shadow: 0px 0px 8px rgba(255, 0, 0, 0.5);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 16px;
+            color: #000;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            background: #000;
+            border: 2px solid #ff0000;
+            border-radius: 5px;
+            color: #fff;
+            box-sizing: border-box;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            box-shadow: 0px 0px 10px #ff0000;
+            outline: none;
+        }
+
+        .user-type {
+            display: flex;
+            justify-content: space-around;
+            margin: 25px 0;
+        }
+
+        .user-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .user-option input {
+            margin-top: 10px;
+        }
+
+        .icon {
+            width: 60px;
+            height: 60px;
+            background: #000;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #ff0000;
+            font-size: 30px;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+            border: 2px solid #fff;
+        }
+
+        .user-option:hover .icon {
+            transform: scale(1.1);
+            box-shadow: 0px 0px 15px #ff0000;
+        }
+
+        button {
+            padding: 12px 24px;
+            font-size: 18px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background: #ff0000;
+            color: white;
+            text-transform: uppercase;
+            box-shadow: 0px 0px 5px #ff0000;
+            transition: all 0.3s;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        button:hover {
+            background: #990000;
+            box-shadow: 0px 0px 15px #ff0000;
+            transform: translateY(-2px);
+        }
+
+        #error-message {
+            color: #ff0000;
+            margin-top: 15px;
+            font-weight: bold;
+            min-height: 20px;
+            text-shadow: 0px 0px 5px rgba(255, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h1>Escape Room</h1>
+        
+        <div class="user-type">
+            <label class="user-option">
+                <div class="icon">👨‍🎓</div>
+                <span>Élève</span>
+                <input type="radio" name="userType" value="student" checked>
+            </label>
+            
+            <label class="user-option">
+                <div class="icon">👨‍🏫</div>
+                <span>Professeur</span>
+                <input type="radio" name="userType" value="teacher">
+            </label>
+        </div>
+        
+        <div class="form-group">
+            <label for="username">Nom d'utilisateur</label>
+            <input type="text" id="username" placeholder="Entrez votre identifiant">
+        </div>
+        
+        <div class="form-group">
+            <label for="password">Mot de passe</label>
+            <input type="password" id="password" placeholder="Entrez votre mot de passe">
+        </div>
+        
+        <button onclick="login()">Connexion</button>
+        
+        <div id="error-message"></div>
+    </div>
+
+    <script>
+        // Définition des comptes utilisateurs
+        const users = {
+            teachers: [
+                { username: "prof", password: "admin123" }
+            ],
+            students: [
+                { username: "eleve", password: "eleve123" }
+            ]
+        };
+
+        // Fonction de connexion
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const userType = document.querySelector('input[name="userType"]:checked').value;
+            
+            // Vérification des champs vides
+            if (!username || !password) {
+                document.getElementById('error-message').textContent = "Veuillez remplir tous les champs.";
+                return;
+            }
+            
+            let authenticated = false;
+            
+            if (userType === 'teacher') {
+                authenticated = users.teachers.some(user => 
+                    user.username === username && user.password === password);
+                
+                if (authenticated) {
+                    // Stocker l'information de connexion
+                    localStorage.setItem('escapeRoomUserType', 'teacher');
+                    localStorage.setItem('escapeRoomUsername', username);
+                    
+                    // Redirection vers l'interface professeur
+                    window.location.href = 'claude.html';
+                }
+            } else if (userType === 'student') {
+                authenticated = users.students.some(user => 
+                    user.username === username && user.password === password);
+                
+                if (authenticated) {
+                    // Stocker l'information de connexion
+                    localStorage.setItem('escapeRoomUserType', 'student');
+                    localStorage.setItem('escapeRoomUsername', username);
+                    
+                    // Redirection vers l'interface élève
+                    window.location.href = 'vueEleve.html';
+                }
+            }
+            
+            if (!authenticated) {
+                document.getElementById('error-message').textContent = "Identifiant ou mot de passe incorrect.";
+                
+                // Animation de secousse sur les champs
+                const inputs = document.querySelectorAll('input[type="text"], input[type="password"]');
+                inputs.forEach(input => {
+                    input.style.animation = 'none';
+                    setTimeout(() => {
+                        input.style.animation = 'shake 0.5s';
+                    }, 10);
+                });
+            }
+        }
+        
+        // Permettre la connexion en appuyant sur Entrée
+        document.getElementById('password').addEventListener('keyup', function(event) {
+            if (event.key === 'Enter') {
+                login();
+            }
+        });
+        
+        // Ajout d'une animation de secousse pour les erreurs
+        const styleSheet = document.createElement("style");
+        styleSheet.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+                20%, 40%, 60%, 80% { transform: translateX(5px); }
+            }
+        `;
+        document.head.appendChild(styleSheet);
+        
+        // Vérifier si l'utilisateur est déjà connecté
+        window.onload = function() {
+            const userType = localStorage.getItem('escapeRoomUserType');
+            if (userType === 'teacher') {
+                window.location.href = 'claude.html';
+            } else if (userType === 'student') {
+                window.location.href = 'vueEleve.html';
+            }
+        };
+    </script>
+</body>
+</html>
