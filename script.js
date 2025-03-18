@@ -38,17 +38,32 @@ function playAlarm() {
     const alarm = new Audio('alarm.mp3'); // Assurez-vous d'ajouter un fichier 'alarm.mp3' dans le même dossier
     alarm.play();
 }
-const correctCode = "1234"; // Code secret
+let savedCode = ''; // Variable pour sauvegarder le code
 
+// Fonction pour enregistrer le code entré dans le premier champ
+function saveSafeCode() {
+    savedCode = document.getElementById('safe-code').value;
+    console.log('Code enregistré:', savedCode); // Affichage dans la console pour debug
+}
+
+// Fonction pour comparer le code sauvegardé avec les entrées suivantes
 function checkSafeCode() {
-    const userCode = document.getElementById("codeInput").value;
-    const errorMessage = document.getElementById("errorMessage");
+    // Récupérer les valeurs des entrées du deuxième champ
+    let code1 = document.getElementById('code1').value;
+    let code2 = document.getElementById('code2').value;
+    let code3 = document.getElementById('code3').value;
+    let code4 = document.getElementById('code4').value;
 
-    if (userCode === correctCode) {
-        alert("✅ Code correct ! Le coffre est ouvert !");
-        errorMessage.style.display = "none";
+    // Créer une chaîne à partir des valeurs des entrées
+    let enteredCode = code1 + code2 + code3 + code4;
+
+    // Comparer les deux codes
+    if (enteredCode === savedCode) {
+        document.getElementById('safe-message').innerText = 'Code correct, coffre ouvert !';
+        document.getElementById('errorMessage').style.display = 'none'; // Cacher le message d'erreur
     } else {
-        errorMessage.style.display = "block";
+        document.getElementById('errorMessage').style.display = 'block'; // Afficher le message d'erreur
+        document.getElementById('safe-message').innerText = ''; // Réinitialiser le message de succès
     }
 }
 
