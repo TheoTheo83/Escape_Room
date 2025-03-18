@@ -102,7 +102,7 @@ function playAlarm() {
     alarm.play();
 
     // Afficher l'alerte visuelle
-    AlerteVisuel.afficherMessage("⏰ TEMPS ÉCOULÉ !");
+    AlerteVisuel.afficherMessage("⏰ TEMPS ÉCOULÉ ! ⏰");
 }
 
 function triggerVisualAlert() {
