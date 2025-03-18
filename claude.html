@@ -286,7 +286,7 @@
     <div id="preview-modal" class="modal">
         <span class="close-modal" onclick="closeStudentView()">&times;</span>
         <div class="modal-content">
-            <iframe id="student-iframe" src="vueEleve.html"></iframe>
+            <iframe id="student-iframe" src=""></iframe>
         </div>
     </div>
 
@@ -425,6 +425,11 @@
         
         // Afficher la vue élève dans une modal
         function showStudentView() {
+            // Configuration de l'élève temporaire pour la prévisualisation
+            localStorage.setItem('escapeRoomTempUserType', 'student');
+            
+            // Définir la source de l'iframe après avoir configuré le localStorage
+            document.getElementById('student-iframe').src = 'vueEleve.html';
             document.getElementById('preview-modal').style.display = 'block';
             logStatus("Prévisualisation de la vue élève ouverte");
         }
@@ -432,12 +437,39 @@
         // Fermer la modal de prévisualisation
         function closeStudentView() {
             document.getElementById('preview-modal').style.display = 'none';
+            // Supprimer le statut temporaire d'élève
+            localStorage.removeItem('escapeRoomTempUserType');
         }
         
         // Ouvrir la vue élève dans un nouvel onglet
         function openStudentViewInNewTab() {
-            window.open('vueEleve.html', '_blank');
-            logStatus("Vue élève ouverte dans un nouvel onglet");
+            // Stocker les informations de la session professeur pour les récupérer après la redirection
+            const teacherInfo = {
+                username: localStorage.getItem('escapeRoomUsername'),
+                userType: 'teacher'
+            };
+            
+            // Enregistrer dans le sessionStorage (qui sera disponible même après le rechargement dans l'onglet actuel)
+            sessionStorage.setItem('teacherSession', JSON.stringify(teacherInfo));
+            
+            // Définir un indicateur pour le nouvel onglet
+            localStorage.setItem('escapeRoomTempUserType', 'student');
+            
+            // Ouvrir dans un nouvel onglet
+            const newWindow = window.open('vueEleve.html', '_blank');
+            
+            // Si le nouvel onglet est ouvert avec succès
+            if (newWindow) {
+                logStatus("Vue élève ouverte dans un nouvel onglet");
+                
+                // Attendre un court instant pour s'assurer que le nouvel onglet a eu le temps de lire la valeur
+                setTimeout(function() {
+                    // Restaurer le type d'utilisateur pour cet onglet
+                    localStorage.setItem('escapeRoomUserType', 'teacher');
+                }, 500);
+            } else {
+                logStatus("ERREUR: Impossible d'ouvrir la vue élève. Veuillez vérifier les paramètres de blocage des popups.");
+            }
         }
         
         // Réinitialiser toute la progression
